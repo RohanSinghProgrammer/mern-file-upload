@@ -64,7 +64,7 @@ const App = () => {
         pauseOnHover
         theme="light"
       />
-      <h1 className="text-2xl font-bold">MERN File Uploader ❤️🐳</h1>
+      <h1 className="text-2xl font-bold">MERN Image Uploader ❤️🐳</h1>
       <div className="h-[80vh] flex flex-col gap-4">
         {/* ------------------- IMAGE UPLOAD CONTAINER ------------------- */}
         <FileUploader
