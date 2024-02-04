@@ -5,8 +5,6 @@ import axios from "axios";
 
 const App = () => {
   const [image, setImage] = useState(null);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,8 +14,6 @@ const App = () => {
     setLoading(true);
     const formData = new FormData();
     formData.append("image", image);
-    formData.append("name", name);
-    formData.append("email", email);
     try {
       const res = await axios.post("http://localhost:4000/uploads", formData);
       if (res.ok) {
@@ -46,20 +42,6 @@ const App = () => {
       />
       <h1 className="text-2xl font-bold">MERN File Uploader ❤️🐳</h1>
       <form onSubmit={handleSubmit} className="h-[80vh] flex flex-col gap-4">
-        <input
-          type="text"
-          placeholder="Enter your name"
-          className="input input-bordered input-accent w-full max-w-xs"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
-          type="email"
-          placeholder="Enter your email"
-          className="input input-bordered input-accent w-full max-w-xs"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
         <input
           onChange={(e) => setImage(e.target.files[0])}
           type="file"
