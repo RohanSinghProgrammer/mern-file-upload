@@ -1,28 +1,45 @@
 import { useState } from "react";
+import { FileUploader } from "react-drag-drop-files";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
 const App = () => {
-  const [image, setImage] = useState(null);
+  const fileTypes = ["JPG", "JPEG", "PNG", "GIF"];
+  const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const handleChange = (file) => {
+    setFile(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!image || name.length < 1 || email.length < 1) {
-      return toast.error("Please Fill all fields!");
-    }
+    if (!file) return toast.error("Please select a File!");
     setLoading(true);
-    const formData = new FormData();
-    formData.append("image", image);
     try {
-      const res = await axios.post("http://localhost:4000/uploads", formData);
-      if (res.ok) {
+      let res = await axios.post(
+        "http://localhost:4000/uploads",
+        {
+          image: file,
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      if (res.status === 201) {
         toast.success("Image Uploaded Successfully!");
-        setLoading(false);
+      } else {
+        toast.warn("Something Went Wrong! Contact Developer.");
+        console.log(res);
       }
-    } catch (err) {
-      toast.error(err.message);
+    } catch (error) {
+      return toast.error(error.message);
+    } finally {
       setLoading(false);
+      setFile(null);
     }
   };
   return (
@@ -38,16 +55,18 @@ const App = () => {
         draggable
         pauseOnHover
         theme="light"
-        transition:Bounce
       />
       <h1 className="text-2xl font-bold">MERN File Uploader ❤️🐳</h1>
       <form onSubmit={handleSubmit} className="h-[80vh] flex flex-col gap-4">
-        <input
-          onChange={(e) => setImage(e.target.files[0])}
-          type="file"
-          className="file-input file-input-bordered file-input-accent w-full max-w-xs"
+        <FileUploader
+          handleChange={handleChange}
+          name="file"
+          types={fileTypes}
         />
-        <button className="btn btn-accent" type="submit">
+        <button
+          className="px-12 py-4 bg-cyan-500 rounded-lg text-white hover:bg-cyan-600 active:scale-90"
+          type="submit"
+        >
           {loading ? (
             <>
               <span className="loading loading-spinner"></span>
