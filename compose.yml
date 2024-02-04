@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  web:
+    depends_on:
+      - api
+    build: ./app
+    ports:
+      - 5173:5173
+    environment:
+      - VITE_API_URL=http://localhost:4000
+
+volumes:
+  images:

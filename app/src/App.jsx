@@ -11,7 +11,6 @@ const App = () => {
 
   // SET IMAGE TO STATE
   const handleChange = (file) => {
-    console.log(file);
     setFile(file);
   };
 
@@ -27,7 +26,7 @@ const App = () => {
     setLoading(true);
     try {
       let res = await axios.post(
-        "http://localhost:4000/uploads",
+        `${import.meta.env.VITE_API_URL}/uploads`,
         {
           image: file,
         },
@@ -93,6 +92,7 @@ const App = () => {
               onClick={() => setFile(null)}
               className="absolute top-0 right-0 p-2 text-xs rounded-lg h-8 cursor-pointer"
               src="delete-icon.jpeg"
+              alt="-"
             />
             <img src={URL.createObjectURL(file)} className="h-16" />
             <p>{file.name}</p>
