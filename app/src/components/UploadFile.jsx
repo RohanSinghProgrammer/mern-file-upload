@@ -3,16 +3,53 @@ import { FileUploader } from "react-drag-drop-files";
 import UploadPlaceholderImg from "../assets/upload-placeholder.jpeg";
 import RemoveIcon from "../assets/remove.svg";
 import CloseIcon from "../assets/close.svg";
+import { useState } from "react";
+import { toast } from "react-toastify";
+import axios from "axios";
 
-const UploadFile = ({
-  handleTypeError,
-  handleChange,
-  fileTypes,
-  file,
-  setFile,
-  handleSubmit,
-  setModal,
-}) => {
+const UploadFile = ({ setModal }) => {
+  const fileTypes = ["JPG", "JPEG", "PNG", "GIF"];
+  const [file, setFile] = useState(null);
+
+  // SET IMAGE TO STATE
+  const handleChange = (file) => {
+    setFile(file);
+  };
+
+  // CHECK IMAGE TYPE
+  const handleTypeError = (err) => {
+    toast.error(err);
+  };
+
+  // HANDLE IMAGE UPLOAD
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!file) return toast.error("Please select a File!");
+    try {
+      let res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/uploads`,
+        {
+          image: file,
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      if (res.status === 201) {
+        toast.success("Image Uploaded Successfully!");
+        setModal(false);
+      } else {
+        toast.warn("Something Went Wrong! Contact Developer.");
+        console.log(res);
+      }
+    } catch (error) {
+      return toast.error(error.message);
+    } finally {
+      setFile(null);
+    }
+  };
   return (
     <div className="flex flex-col gap-4 bg-white p-8 rounded-xl relative">
       <button
