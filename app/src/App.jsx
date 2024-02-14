@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { FileUploader } from "react-drag-drop-files";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import UploadFile from "./components/UploadFile";
 
 const App = () => {
+  const [modal, setModal] = useState(false);
   const fileTypes = ["JPG", "JPEG", "PNG", "GIF"];
   const [file, setFile] = useState(null);
-  const [loading, setLoading] = useState(false);
 
   // SET IMAGE TO STATE
   const handleChange = (file) => {
@@ -23,7 +23,6 @@ const App = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file) return toast.error("Please select a File!");
-    setLoading(true);
     try {
       let res = await axios.post(
         `${import.meta.env.VITE_API_URL}/uploads`,
@@ -38,6 +37,7 @@ const App = () => {
       );
       if (res.status === 201) {
         toast.success("Image Uploaded Successfully!");
+        setModal(false);
       } else {
         toast.warn("Something Went Wrong! Contact Developer.");
         console.log(res);
@@ -45,16 +45,15 @@ const App = () => {
     } catch (error) {
       return toast.error(error.message);
     } finally {
-      setLoading(false);
       setFile(null);
     }
   };
   return (
-    <div className="grid place-items-center h-screen">
+    <div className="flex flex-col h-screen">
       {/* ------------------- TOAST CONTAINER ------------------- */}
       <ToastContainer
         position="top-right"
-        autoClose={2000}
+        autoClose={1000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
@@ -64,55 +63,37 @@ const App = () => {
         pauseOnHover
         theme="light"
       />
-      <h1 className="text-2xl font-bold">MERN Image Uploader ❤️🐳</h1>
-      <div className="h-[80vh] flex flex-col gap-4">
-        {/* ------------------- IMAGE UPLOAD CONTAINER ------------------- */}
-        <FileUploader
-          onTypeError={handleTypeError}
-          handleChange={handleChange}
-          name="file"
-          types={fileTypes}
-        >
-          <div className="w-80 p-4  border border-gray-500 border-dashed grid place-items-center rounded-lg">
-            <img src="upload-placeholder.jpeg" />
-            <div>
-              <p className="text-lg text-center mb-2 font-semibold">
-                Drag & Drop or Click here to upload Image
-              </p>
-              <p className="text-sm text-center text-gray-700">
-                Supported only JPG, JPEG, PNG & GIF
-              </p>
-            </div>
-          </div>
-        </FileUploader>
-        {/* ------------------- PREVIEW IMAGE CONTAINER ------------------- */}
-        {file && (
-          <div className="flex items-center space-x-4 relative">
-            <img
-              onClick={() => setFile(null)}
-              className="absolute top-0 right-0 p-2 text-xs rounded-lg h-8 cursor-pointer"
-              src="delete-icon.jpeg"
-              alt="-"
-            />
-            <img src={URL.createObjectURL(file)} className="h-16" />
-            <p>{file.name}</p>
-          </div>
-        )}
+      {/* ---------------------------------- HEADER ---------------------------------- */}
+      <nav className="px-4 flex items-center justify-between h-16 sticky top-0 backdrop-blur-lg">
+        <h5 className="text-xl font-semibold text-cyan-700">Gallery</h5>
         <button
-          onClick={handleSubmit}
-          className="px-12 py-4 bg-cyan-500 rounded-lg text-white hover:bg-cyan-600 active:scale-90"
-          type="submit"
+          onClick={() => setModal(true)}
+          className="bg-cyan-600 hover:bg-cyan-500 rounded-md px-6 py-2 text-white"
         >
-          {loading ? (
-            <>
-              <span className="loading loading-spinner"></span>
-              <p>Loading</p>
-            </>
-          ) : (
-            "Submit"
-          )}
+          Add Image
         </button>
-      </div>
+      </nav>
+      {/* MODAL */}
+      {modal && (
+        <div className="absolute h-screen w-screen bg-[rgba(0,0,0,0.4)] grid place-items-center">
+          <UploadFile
+            setModal={setModal}
+            fileTypes={fileTypes}
+            handleChange={handleChange}
+            handleTypeError={handleTypeError}
+            handleSubmit={handleSubmit}
+            file={file}
+            setFile={setFile}
+          />
+        </div>
+      )}
+      {/* ---------------------------------- BODY ---------------------------------- */}
+      <main className="flex-1"></main>
+      {/* ---------------------------------- FOOTER ---------------------------------- */}
+      <footer className="flex justify-between h-16 items-center px-4 bg-cyan-600 text-white w-screen">
+        <p>Made With ❤️ By Rohan Singh</p>
+        <p>&copy; All Rights Reserved</p>
+      </footer>
     </div>
   );
 };
